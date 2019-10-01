@@ -1,0 +1,60 @@
+plugins {
+    id "java"
+    id "org.springframework.boot" version "2.1.7.RELEASE"
+    id "io.spring.dependency-management" version "1.0.8.RELEASE"
+    id "io.freefair.lombok" version "3.8.2"
+}
+
+
+// this is for dependencies
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.spring.io/snapshot' }
+}
+
+// docker file expects this name and version
+bootJar {
+    archiveBaseName.set("phantomscc-service")
+    archiveVersion.set("latest")
+}
+
+// common variables go here
+ext {
+    springVersion = "2.1.7.RELEASE"
+    lombokVersion = "1.18.6"
+    swaggerVersion = "2.9.2"
+    jmockitVersion = "1.47"
+    springCloudStarterVersion = "2.1.2.RELEASE"
+    springCloudGcpVersion = "1.1.1.RELEASE"
+    hystrixDashboardVersion = "1.4.7.RELEASE"
+    set('springCloudVersion', "Greenwich.SR2")
+}
+
+dependencies {
+    compileOnly("org.projectlombok:lombok:${lombokVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-web:${springVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-json:${springVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:${springVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-actuator:${springVersion}")
+    implementation("net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1")
+    implementation("org.springframework.cloud:spring-cloud-gcp-starter-sql-postgresql:1.1.2.RELEASE")
+    implementation("org.flywaydb:flyway-core:5.2.4")
+    implementation("io.springfox:springfox-swagger2:${swaggerVersion}")
+    implementation("io.springfox:springfox-swagger-ui:${swaggerVersion}")
+    implementation("net.logstash.logback:logstash-logback-encoder:6.1")
+
+    testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
+    testImplementation("junit:junit:4.12")
+    testImplementation("org.jmockit:jmockit:${jmockitVersion}")
+    testImplementation("org.assertj:assertj-core:3.11.1")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:${springVersion}")
+}
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+test {
+    jvmArgs += ["-javaagent:${classpath.find { it.name.contains("jmockit") }.absolutePath}"]
+    systemProperties System.properties
+}
